@@ -76,40 +76,51 @@ class My_Classifier_Model:
         """
         Train pipeline on dataset and save artifacts
         """
-        data = pd.read_csv(dataset_filename, index_col=0)
+        try: 
+            data = pd.read_csv(dataset_filename, index_col=0)
 
-        self.label_encoder = LabelEncoder()
-        y = self.label_encoder.fit_transform(data["Status"])
-        X = data.drop(["Status"], axis=1)
+            self.label_encoder = LabelEncoder()
+            y = self.label_encoder.fit_transform(data["Status"])
+            X = data.drop(["Status"], axis=1)
 
-        # Train pipeline
-        if self.pipeline is None:
-            self.pipeline = My_Classifier_Model._build_default_pipeline(dataset_filename)
-        self.pipeline.fit(X, y)
+            # Train pipeline
+            if self.pipeline is None:
+                self.pipeline = self._build_default_pipeline(dataset_filename)
+            self.pipeline.fit(X, y)
 
-        # Save artifacts
-        joblib.dump(self.pipeline, self.classifier_file)
-        logging.info(f"Trained model on {dataset_filename}")
+            # Save artifacts
+            joblib.dump(self.pipeline, self.classifier_file)
+            logging.info(f"Trained model on {dataset_filename}")
+            
+        except Exception as e:
+            logging.error(f"Error during training: {e}")
+            raise e
+        
 
     def predict(self, dataset_filename):
         """
         Predict on a test dataset and save predictions to submission_probs.csv
         """
-        
-        pipeline = joblib.load(self.classifier_file)
-        X_test = pd.read_csv(
-            dataset_filename, index_col=0
-        )
-        
-        X_test_ids = X_test.index
+        try:
+            pipeline = joblib.load(self.classifier_file)
+            X_test = pd.read_csv(
+                dataset_filename, index_col=0
+            )
+            
+            X_test_ids = X_test.index
 
-        test_preds_proba = pipeline.predict_proba(X_test)
+            test_preds_proba = pipeline.predict_proba(X_test)
+            
+            class_names = [f"Status_{i}" for i in range(test_preds_proba.shape[1])]
+            output = pd.DataFrame(test_preds_proba, columns=class_names)
+            
+            output.insert(0, "id", X_test_ids)
+            output.to_csv(self.results_file, index=False)
+            logging.info(f"Predicted on {dataset_filename} and saved results to {self.results_file}")
+        except Exception as e:
+            logging.error(f"Error during prediction: {e}")
+            raise e
         
-        class_names = [f"Status_{i}" for i in range(test_preds_proba.shape[1])]
-        output = pd.DataFrame(test_preds_proba, columns=class_names)
-        
-        output.insert(0, "id", X_test_ids)
-        output.to_csv(self.results_file, index=False)
 
 
 
