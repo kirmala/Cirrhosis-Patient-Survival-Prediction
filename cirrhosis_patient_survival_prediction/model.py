@@ -9,6 +9,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.impute import SimpleImputer
 from xgboost import XGBClassifier
+from fire import Fire
 
 
 class My_Classifier_Model:
@@ -22,7 +23,7 @@ class My_Classifier_Model:
     classifier_file = "./model/pipeline.pkl"
     
 
-    def __init__(self, pipeline):
+    def __init__(self, pipeline=None):
         """
         pipeline: any sklearn Pipeline object (preprocessing + estimator)
         """
@@ -37,7 +38,7 @@ class My_Classifier_Model:
             format="%(asctime)s - %(levelname)s - %(message)s",
         )
 
-    def _build_default_pipeline(dataset_path):
+    def _build_default_pipeline(self, dataset_path):
         """
         Automatically detect numerical and categorical columns
         from dataset and build pipeline.
@@ -72,12 +73,12 @@ class My_Classifier_Model:
 
         return pipeline
 
-    def train(self, dataset_filename):
+    def train(self, dataset):
         """
         Train pipeline on dataset and save artifacts
         """
         try: 
-            data = pd.read_csv(dataset_filename, index_col=0)
+            data = pd.read_csv(dataset, index_col=0)
 
             self.label_encoder = LabelEncoder()
             y = self.label_encoder.fit_transform(data["Status"])
@@ -85,26 +86,26 @@ class My_Classifier_Model:
 
             # Train pipeline
             if self.pipeline is None:
-                self.pipeline = self._build_default_pipeline(dataset_filename)
+                self.pipeline = self._build_default_pipeline(dataset)
             self.pipeline.fit(X, y)
 
             # Save artifacts
             joblib.dump(self.pipeline, self.classifier_file)
-            logging.info(f"Trained model on {dataset_filename}")
+            logging.info(f"Trained model on {dataset}")
             
         except Exception as e:
             logging.error(f"Error during training: {e}")
             raise e
         
 
-    def predict(self, dataset_filename):
+    def predict(self, dataset):
         """
         Predict on a test dataset and save predictions to submission_probs.csv
         """
         try:
             pipeline = joblib.load(self.classifier_file)
             X_test = pd.read_csv(
-                dataset_filename, index_col=0
+                dataset, index_col=0
             )
             
             X_test_ids = X_test.index
@@ -116,7 +117,7 @@ class My_Classifier_Model:
             
             output.insert(0, "id", X_test_ids)
             output.to_csv(self.results_file, index=False)
-            logging.info(f"Predicted on {dataset_filename} and saved results to {self.results_file}")
+            logging.info(f"Predicted on {dataset} and saved results to {self.results_file}")
         except Exception as e:
             logging.error(f"Error during prediction: {e}")
             raise e
@@ -127,18 +128,4 @@ class My_Classifier_Model:
 
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description="Train or Predict using My_Classifier_Model")
-
-    parser.add_argument("command", choices=["train", "predict"], help="train or predict")
-    parser.add_argument("--dataset", required=True, help="Path to dataset CSV file")
-
-    args = parser.parse_args()
-    
-    model = My_Classifier_Model(pipeline=None)
-
-    if args.command == "train":
-        model.train(args.dataset)
-
-    elif args.command == "predict":
-        model.predict(args.dataset)
+    Fire(My_Classifier_Model)
