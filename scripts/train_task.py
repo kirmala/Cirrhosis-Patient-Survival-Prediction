@@ -4,6 +4,7 @@ import pandas as pd
 from clearml import Task, OutputModel, Dataset
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import log_loss
+from sklearn.preprocessing import LabelEncoder
 
 from cirrhosis_patient_survival_prediction.model import My_Classifier_Model  # adjust import
 
@@ -37,7 +38,8 @@ def main(dataset_path):
     # 4️⃣ Load dataset
     data = pd.read_csv(dataset_path, index_col=0)
 
-    y = data["Status"]
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(data["Status"])
     X = data.drop(["Status"], axis=1)
 
     X_train, X_valid, y_train, y_valid = train_test_split(
@@ -57,14 +59,14 @@ def main(dataset_path):
 
     print(f"Validation log_loss: {score}")
 
-    # # 7️⃣ Upload best model artifact
-    # output_model = OutputModel(task=task)
+    # 7️⃣ Upload best model artifact
+    output_model = OutputModel(task=task)
     
-    # output_model.update_weights(
-    #     weights_filename=model.classifier_file,
-    # )
+    output_model.update_weights(
+        weights_filename=model.classifier_file,
+    )
 
-    # print("Model uploaded to ClearML.")
+    print("Model uploaded to ClearML.")
 
 
 if __name__ == "__main__":

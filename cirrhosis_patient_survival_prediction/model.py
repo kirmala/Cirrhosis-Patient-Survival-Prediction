@@ -30,7 +30,6 @@ class My_Classifier_Model:
         "max_depth": 6,
         "subsample": 0.8,
         "colsample_bytree": 0.8,
-        "gamma": 1,
     }
 
     def __init__(self, hyperparameters=None):
