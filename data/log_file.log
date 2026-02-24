@@ -1,0 +1,6 @@
+2026-02-22 15:33:55,595 - ERROR - Error during training: Task.init() got an unexpected keyword argument 'project_Lname'. Did you mean 'project_name'?
+2026-02-22 15:36:36,905 - INFO - Model trained with hyperparameters: {'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 6, 'subsample': 0.8, 'colsample_bytree': 0.8, 'gamma': 1}
+2026-02-22 18:12:25,622 - INFO - Model trained with hyperparameters: {'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 6, 'subsample': 0.8, 'colsample_bytree': 0.8, 'gamma': 1}
+2026-02-22 19:10:17,591 - INFO - Model trained with hyperparameters: {'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 6, 'subsample': 0.8, 'colsample_bytree': 0.8}
+2026-02-23 11:15:28,938 - INFO - Model trained with hyperparameters: {'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 6, 'subsample': 0.8, 'colsample_bytree': 0.8}
+2026-02-23 11:44:40,892 - INFO - Model trained with hyperparameters: {'n_estimators': 1000, 'learning_rate': 0.01, 'max_depth': 6, 'subsample': 0.8, 'colsample_bytree': 0.8}
