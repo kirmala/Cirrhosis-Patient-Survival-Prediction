@@ -1,4 +1,4 @@
-from clearml import OutputModel, Task
+from clearml import Dataset, OutputModel, Task
 from clearml.automation import HyperParameterOptimizer
 from clearml.automation.optuna import OptimizerOptuna
 from clearml.automation.parameters import (
@@ -12,6 +12,7 @@ def main():
         project_name="Cirrosis Patient Survival Prediction",
         task_name="HPO Controller",
         task_type=Task.TaskTypes.optimizer,
+        reuse_last_task_id=False
     )
     
     args = {
@@ -43,10 +44,11 @@ def main():
         objective_metric_sign="min",
         optimizer_class=OptimizerOptuna,
         # This dictionary is passed to the OptimizerOptuna constructor
-        max_number_of_concurrent_tasks=4,
+        max_number_of_concurrent_tasks=1,
         execution_queue="default",
         total_max_jobs=50,
-        max_iteration_per_job=1,  # Each job runs the training task once with a different set of hyperparameters
+        max_iteration_per_job=1,
+        # Each job runs the training task once with a different set of hyperparameters
     )
 
     optimizer.start()
@@ -58,18 +60,16 @@ def main():
 
         # 3. Log Best Task Weights to the Controller
         # Get the output model from the best training task
-        best_model = best_task.get_models_associated_with_task()[-1]
+        best_model = best_task.get_models()['output'][-1]
 
         # Create an OutputModel for the Controller to "inherit" the best weights
         output_model = OutputModel(task=task, name="Best HPO Model")
-        output_model.update_weights(registered_uri=best_model.url)
-
-        # 4. Log Training Dataset Information
-        # Use task.set_user_properties or artifacts to link the dataset path/ID
-        task.set_user_properties(
-            best_task_id=best_task.id,
-            dataset_used=best_task.get_parameters().get("Args/dataset", "unknown"),
-        )
+        output_model.update_weights(register_uri=best_model.url)
+        
+        dataset = Dataset.create(dataset_name="my_dataset", dataset_project="my_project")
+        dataset.add_files(path=best_task.get_parameters().get("Args/dataset", "unknown"),)
+        dataset.upload()
+        dataset.finalize() 
 
         best_params = best_task.get_parameters()
 
