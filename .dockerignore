@@ -1,0 +1,41 @@
+# Byte-compiled / optimized / DLL files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+.venv
+env
+/venv
+/env
+
+# Distribution / packaging
+build/
+dist/
+eggs/
+*.egg-info/
+
+# Editors/IDE-specific files
+.vscode
+.idea
+.project
+.classpath
+
+# Version control
+.git
+.gitignore
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+pip-log.txt
+.cache
+
+# Sensitive files/credentials (adjust as needed for your project)
+.env
+.aws
+secrets.dev.yaml

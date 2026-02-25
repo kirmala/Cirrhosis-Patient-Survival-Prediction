@@ -25,11 +25,11 @@ class My_Classifier_Model:
     classifier_file = "./model/pipeline.pkl"
 
     default_hyperparameters = {
-        "n_estimators": 1000,
-        "learning_rate": 0.01,
-        "max_depth": 6,
-        "subsample": 0.8,
-        "colsample_bytree": 0.8,
+        "n_estimators": 850,
+        "learning_rate": 0.03655427593513622,
+        "max_depth": 4,
+        "subsample": 0.7683370898124168,
+        "colsample_bytree": 0.5523898120612046,
     }
 
     def __init__(self, hyperparameters=None):
